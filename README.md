@@ -1,7 +1,16 @@
 # ClaimIQ — Motor Insurance Claim Frequency and Pure Premium Simulator
 
-An actuarial decision-support tool comparing classical statistical models and
-machine learning techniques for motor insurance claim frequency prediction.
+An actuarial decision-support tool comparing classical statistical models and machine learning techniques for motor insurance claim frequency prediction.
+
+## 🌐 Live Demo
+
+[![Launch ClaimIQ](https://img.shields.io/badge/Launch-ClaimIQ-0A84FF?style=for-the-badge)](https://claimiq-app.streamlit.app)
+
+## 📸 Application Preview
+
+<p align="center">
+  <img src="images/home.png" width="900" alt="ClaimIQ application homepage">
+</p>
 
 ---
 
