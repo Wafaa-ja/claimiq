@@ -1,13 +1,11 @@
-<h1 align="center">
-🚗 ClaimIQ
-</h1>
+<h1 align="center">ClaimIQ</h1>
 
 <p align="center">
-<b>Motor Insurance Claim Frequency & Pure Premium Simulator</b>
+Motor Insurance Claim Frequency & Pure Premium Simulator
 </p>
 
 <p align="center">
-An actuarial decision-support application comparing classical statistical models and machine learning techniques.
+An actuarial decision-support application comparing classical statistical models and machine learning techniques for motor insurance claim frequency prediction.
 </p>
 
 <p align="center">
@@ -23,13 +21,13 @@ An actuarial decision-support application comparing classical statistical models
 </p>
 
 <p align="center">
-<img src="images/home-v2.png" width="100%">
+  <img src="images/home-v2.png" width="950">
 </p>
 
-## 🌐 Live Demo
+##  Live Demo
 
 [![Launch ClaimIQ](https://img.shields.io/badge/Launch-ClaimIQ-0A84FF?style=for-the-badge)](https://claimiq-app.streamlit.app)
-## ✨ Features
+##  Features
 
 - Predict motor insurance claim frequency using four fitted models.
 - Compare Poisson GLM, Negative Binomial GLM, Random Forest, and XGBoost.
@@ -55,7 +53,7 @@ comprising 678,013 policy records.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 app.py                # Main Streamlit application
@@ -66,7 +64,7 @@ images/               # README screenshots
 utils/                # Helper functions
 ```
 
-## 🚀 Installation
+## Installation
 
 ```bash
 git clone https://github.com/Wafaa-ja/claimiq.git
@@ -95,81 +93,52 @@ streamlit run app.py
 
 ---
 
-## Actuarial Formulas
+---
 
-### Claim Frequency (GLMs)
-```
-log(μᵢ) = β₀ + β₁·BonusMalus + β₂·DrivAge + β₃·VehAge + β₄·Density + log(Exposure)
-```
+## Technologies Used
 
-Poisson GLM coefficients from the French MTPL dataset:
-- Intercept: −3.7115
-- BonusMalus: +0.02289
-- DrivAge: +0.00687
-- VehAge: −0.04281
-- Density: +9.68 × 10⁻⁶
-
-### Annualised Frequency
-```
-Annualised Frequency = Predicted Claims / Exposure
-```
-
-### Pure Premium
-```
-Pure Premium = Predicted Claim Frequency × Average Claim Cost
-```
-
-### Loaded Premium (optional)
-```
-Loaded Premium = Pure Premium / (1 − Expense Ratio − Profit Margin)
-```
+| Category | Technologies |
+|----------|--------------|
+| Language | Python 3.13 |
+| Web Framework | Streamlit |
+| Machine Learning | Scikit-learn, XGBoost |
+| Statistical Modeling | Statsmodels (Poisson GLM, Negative Binomial GLM) |
+| Data Processing | Pandas, NumPy |
+| Visualization | Plotly |
 
 ---
 
-## Input Ranges (Training Data)
+## Dataset
 
-| Variable | Min | Max | Dataset Mean |
-|----------|-----|-----|--------------|
-| DrivAge | 18 | 100 | 45.5 |
-| VehAge | 0 | 100 | 7.0 |
-| BonusMalus | 50 | 230 | 59.8 |
-| Density | 1 | 27,000 | 1,792 |
-| Exposure | 0.01 | 2.00 | 0.53 |
+This project is based on the French Motor Third-Party Liability (MTPL) dataset containing approximately **678,000 insurance policies**.
 
----
+The application predicts **annual claim frequency** using both classical actuarial models and modern machine learning methods.
 
-## Deployment to Streamlit Community Cloud
+**Input variables include:**
 
-1. Push the project to a GitHub repository.
-2. Ensure `requirements.txt` is in the root.
-3. Add model `.pkl` files to the `models/` folder and commit them,
-   or use `st.secrets` + cloud storage for large files.
-4. Connect the repository at https://share.streamlit.io.
-5. Set the main file path to `app.py`.
+- Driver Age
+- Vehicle Age
+- Bonus-Malus
+- Population Density
+- Exposure
 
 ---
 
-## Limitations
+## Future Improvements
 
-- Trained on one national dataset (French MTPL); findings may not generalise.
-- Only claim frequency is modelled. Full pricing requires claim severity.
-- The tool is a proof-of-concept and must not be used for actual quotations.
-
----
-
-## Disclaimer
-
-This application is provided for research and educational purposes only.
-All outputs are illustrative. They must not be treated as insurance quotations,
-underwriting recommendations, or official actuarial estimates.
+- Predict claim severity in addition to claim frequency.
+- Implement SHAP values for model explainability.
+- Support additional pricing models.
+- Deploy with Docker and cloud infrastructure.
+- Expand the simulator with more insurance datasets.
 
 ---
 
-## References
+## Author
 
-- Noll, A., Salzmann, R., & Wüthrich, M. V. (2018). *Case study: French MTPL claims.* SSRN.
-- Denuit, M., et al. (2007). *Actuarial Modelling of Claim Counts.* Wiley.
-- Goldburd, M., et al. (2025). *GLMs for Insurance Rating.* CAS.
-- Henckaerts, R., et al. (2021). North American Actuarial Journal, 25(2).
-- Breiman, L. (2001). *Machine Learning*, 45(1).
-- Chen, T., & Guestrin, C. (2016). KDD 2016.
+**Wafaa Jawad**
+
+B.S. Actuarial Science  
+King Fahd University of Petroleum and Minerals (KFUPM)
+
+GitHub: https://github.com/Wafaa-ja
