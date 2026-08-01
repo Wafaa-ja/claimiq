@@ -9,7 +9,7 @@ An actuarial decision-support tool comparing classical statistical models and ma
 ## 📸 Application Preview
 
 <p align="center">
-  <img src="images/home.png" width="900" alt="ClaimIQ application homepage">
+  <img src="images/home-v2.png" width="900" alt="ClaimIQ application homepage">
 </p>
 
 ---
