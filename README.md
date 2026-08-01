@@ -1,18 +1,43 @@
-# ClaimIQ — Motor Insurance Claim Frequency and Pure Premium Simulator
+<h1 align="center">
+🚗 ClaimIQ
+</h1>
 
-An actuarial decision-support tool comparing classical statistical models and machine learning techniques for motor insurance claim frequency prediction.
+<p align="center">
+<b>Motor Insurance Claim Frequency & Pure Premium Simulator</b>
+</p>
+
+<p align="center">
+An actuarial decision-support application comparing classical statistical models and machine learning techniques.
+</p>
+
+<p align="center">
+<a href="https://claimiq-app.streamlit.app">
+<img src="https://img.shields.io/badge/🚀_Live_Demo-ClaimIQ-0A84FF?style=for-the-badge">
+</a>
+
+<img src="https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python">
+
+<img src="https://img.shields.io/badge/Streamlit-App-red?style=for-the-badge&logo=streamlit">
+
+<img src="https://img.shields.io/badge/Machine_Learning-XGBoost-success?style=for-the-badge">
+</p>
+
+<p align="center">
+<img src="images/home-v2.png" width="100%">
+</p>
 
 ## 🌐 Live Demo
 
 [![Launch ClaimIQ](https://img.shields.io/badge/Launch-ClaimIQ-0A84FF?style=for-the-badge)](https://claimiq-app.streamlit.app)
+## ✨ Features
 
-## 📸 Application Preview
-
-<p align="center">
-  <img src="images/home-v2.png" width="900" alt="ClaimIQ application homepage">
-</p>
-
----
+- Predict motor insurance claim frequency using four fitted models.
+- Compare Poisson GLM, Negative Binomial GLM, Random Forest, and XGBoost.
+- Estimate illustrative pure premiums.
+- Explore what-if scenarios using interactive sliders.
+- Compare model performance using MAE and AIC.
+- View feature importance and GLM coefficients.
+- Built with Streamlit for an intuitive web interface.
 
 ## Project Overview
 
@@ -30,97 +55,30 @@ comprising 678,013 policy records.
 
 ---
 
-## Project Structure
+## 📂 Project Structure
 
 ```
-claimiq_app/
-├── app.py                      # Main Streamlit application
-├── save_models.py              # Train and save all four models
-├── requirements.txt
-├── README.md
-├── models/
-│   ├── poisson_model.pkl
-│   ├── negative_binomial_model.pkl
-│   ├── random_forest_model.pkl
-│   ├── xgboost_model.pkl
-│   └── feature_metadata.json
-├── data/
-│   └── model_metrics.csv
-├── utils/
-│   ├── __init__.py
-│   ├── model_loader.py
-│   ├── prediction.py
-│   ├── validation.py
-│   └── formatting.py
-└── assets/
-    └── logo.png  (optional)
+app.py                # Main Streamlit application
+save_models.py        # Model training
+models/               # Saved ML models
+data/                 # Dataset & metrics
+images/               # README screenshots
+utils/                # Helper functions
 ```
 
----
-
-## Installation
+## 🚀 Installation
 
 ```bash
-# 1. Clone or download this project
-cd claimiq_app
-
-# 2. Create a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate        # macOS / Linux
-venv\Scripts\activate           # Windows
-
-# 3. Install dependencies
+git clone https://github.com/Wafaa-ja/claimiq.git
+cd claimiq
 pip install -r requirements.txt
-```
-
----
-
-## Step 1 — Save the Models
-
-Before launching the app, you must train and save the four models.
-
-Place your `freMTPL2freq.csv` dataset anywhere accessible, then run:
-
-```bash
-python save_models.py --data path/to/freMTPL2freq.csv
-```
-
-This will:
-- Train all four models using the same train/test split (random_state=42)
-- Save fitted models to the `models/` folder
-- Save evaluation metrics to `data/model_metrics.csv`
-- Save feature metadata to `models/feature_metadata.json`
-
-Expected output:
-```
-Loading dataset from: ...
-Train: 542,410  |  Test: 135,603
-Fitting Poisson GLM...
-  MAE=0.09888  AIC=229548.83
-  Saved to models/poisson_model.pkl
-Fitting Negative Binomial GLM (alpha=1)...
-  MAE=0.09945  AIC=228837.56
-  Saved to models/negative_binomial_model.pkl
-Fitting Random Forest...
-  MAE=0.09809
-  Saved to models/random_forest_model.pkl
-Fitting XGBoost...
-  MAE=0.09821
-  Saved to models/xgboost_model.pkl
-Metrics saved to data/model_metrics.csv
-Feature metadata saved to models/feature_metadata.json
-=== All models saved successfully ===
-```
-
----
-
-## Step 2 — Launch the Application
-
-```bash
 streamlit run app.py
 ```
 
-The application will open at `http://localhost:8501`.
+
+---
+
+
 
 ---
 
