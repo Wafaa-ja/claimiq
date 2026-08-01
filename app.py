@@ -1100,7 +1100,85 @@ def page_about():
 
         st.warning("**Disclaimer:** Research and educational tool only. Must not be used for insurance quotations, underwriting decisions, or commercial pricing.")
 
+        st.markdown(
+            """
+            <div style="
+                margin-top:28px;
+                padding:22px 24px;
+                border:1px solid #dbe4f0;
+                border-radius:14px;
+                background:linear-gradient(135deg, #f8fbff 0%, #f4f7fc 100%);
+                box-shadow:0 4px 14px rgba(15, 35, 70, 0.05);
+            ">
+                <div style="
+                    font-size:12px;
+                    font-weight:700;
+                    letter-spacing:0.08em;
+                    text-transform:uppercase;
+                    color:#64748b;
+                    margin-bottom:10px;
+                ">
+                    Project Author
+                </div>
 
+                <div style="
+                    font-size:22px;
+                    font-weight:750;
+                    color:#0f172a;
+                    margin-bottom:5px;
+                ">
+                    Wafaa Jawad
+                </div>
+
+                <div style="
+                    font-size:14px;
+                    color:#475569;
+                    line-height:1.7;
+                    margin-bottom:16px;
+                ">
+                    B.Sc. Actuarial Science<br>
+                    King Fahd University of Petroleum &amp; Minerals
+                </div>
+
+                <div style="
+                    font-size:13px;
+                    color:#374151;
+                    line-height:1.75;
+                    margin-bottom:18px;
+                ">
+                    ClaimIQ was developed as an actuarial research and decision-support
+                    application to compare classical claim-frequency models with machine
+                    learning methods. The platform translates the study's fitted models,
+                    evaluation results, and key findings into an interactive environment
+                    for prediction, model comparison, scenario analysis, and illustrative
+                    pure-premium estimation.
+                </div>
+
+                <div style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:8px;
+                ">
+                    <span style="background:#eaf2ff;color:#2563eb;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:650;">
+                        Python
+                    </span>
+                    <span style="background:#e9fbf4;color:#059669;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:650;">
+                        Streamlit
+                    </span>
+                    <span style="background:#fff7e6;color:#d97706;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:650;">
+                        Actuarial Modelling
+                    </span>
+                    <span style="background:#f3edff;color:#7c3aed;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:650;">
+                        Machine Learning
+                    </span>
+                    <span style="background:#eef2f7;color:#475569;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:650;">
+                        French MTPL
+                    </span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN
 # ══════════════════════════════════════════════════════════════════════════════
