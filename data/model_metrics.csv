@@ -1,0 +1,5 @@
+model,model_type,mae,aic,main_strength
+Poisson GLM,Statistical,0.09888,229548.83,Interpretability and actuarial familiarity
+Negative Binomial GLM,Statistical,0.09945,228837.56,Accommodates overdispersion
+Random Forest,Machine Learning,0.09809,,Captures nonlinear effects
+XGBoost,Machine Learning,0.09821,,Flexible boosted-tree prediction
