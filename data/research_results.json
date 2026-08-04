@@ -1,0 +1,184 @@
+{
+  "generated_at": "2026-08-03T23:41:24.077054+00:00",
+  "generated_by": "generate_research_results.py",
+  "source_files": {
+    "model_metrics": "data/model_metrics.csv",
+    "nb_comparison": "data/nb_comparison_report.csv",
+    "repeated_split_summary": "data/repeated_split_summary.csv",
+    "repeated_split_raw": "data/repeated_split_results.csv",
+    "feature_metadata": "models/feature_metadata.json",
+    "dataset": "data/freMTPL2freq.csv"
+  },
+  "dataset": {
+    "name": "French MTPL2freq",
+    "n_records": 678013,
+    "train_test_split": {
+      "test_size": 0.2,
+      "random_state": 42
+    },
+    "pct_zero_claims": 94.98,
+    "variables": [
+      {
+        "name": "ClaimNb",
+        "role": "response",
+        "description": "Number of claims reported"
+      },
+      {
+        "name": "Exposure",
+        "role": "offset",
+        "description": "Policy exposure (fraction of year)"
+      },
+      {
+        "name": "DrivAge",
+        "role": "predictor",
+        "description": "Age of insured driver"
+      },
+      {
+        "name": "VehAge",
+        "role": "predictor",
+        "description": "Age of insured vehicle"
+      },
+      {
+        "name": "BonusMalus",
+        "role": "predictor",
+        "description": "Claims-history experience score"
+      },
+      {
+        "name": "Density",
+        "role": "predictor",
+        "description": "Population density of policyholder's area"
+      }
+    ]
+  },
+  "models": {
+    "poisson": {
+      "display_name": "Poisson GLM",
+      "model_type": "Statistical",
+      "primary_split": {
+        "mae": 0.09888,
+        "aic": 229548.83,
+        "log_likelihood": -114769.41,
+        "k_params": 5,
+        "converged": true,
+        "coefficients": {
+          "Intercept": -3.734778752987513,
+          "BonusMalus": 0.02300371928549883,
+          "DrivAge": 0.007218439710043723,
+          "VehAge": -0.04312764163373274,
+          "Density": 9.923396555544447e-06
+        }
+      },
+      "repeated_split": {
+        "n_splits": 20,
+        "mean_mae": 0.098973,
+        "std_mae": 0.000396,
+        "ci95_low": 0.098788,
+        "ci95_high": 0.099159,
+        "mean_poisson_deviance": 0.321685,
+        "n_wins": 0,
+        "pct_wins": 0.0,
+        "avg_rank": 3.0
+      },
+      "main_strength": "Interpretability and actuarial familiarity"
+    },
+    "negative_binomial": {
+      "display_name": "Negative Binomial GLM (NB2, alpha estimated)",
+      "model_type": "Statistical",
+      "primary_split": {
+        "mae": 0.09944,
+        "aic": 228839.46,
+        "log_likelihood": -114413.73,
+        "k_params": 6,
+        "converged": true,
+        "alpha": 0.98456,
+        "alpha_se": 0.04896,
+        "coefficients": {
+          "Intercept": -3.739794555109722,
+          "BonusMalus": 0.023337031259250175,
+          "DrivAge": 0.007298805565384448,
+          "VehAge": -0.04440086506867656,
+          "Density": 1.0448511793955894e-05
+        }
+      },
+      "repeated_split": {
+        "n_splits": 20,
+        "mean_mae": 0.09952,
+        "std_mae": 0.000392,
+        "ci95_low": 0.099336,
+        "ci95_high": 0.099703,
+        "mean_poisson_deviance": 0.321696,
+        "n_wins": 0,
+        "pct_wins": 0.0,
+        "avg_rank": 4.0
+      },
+      "prior_fixed_alpha_comparison": {
+        "alpha": 1.0,
+        "mae": 0.09945,
+        "aic": 228837.56,
+        "k_params": 5,
+        "note": "Superseded production specification. alpha was assumed rather than estimated, and AIC understated by 2 points from not counting alpha as a free parameter (k=5 instead of k=6)."
+      },
+      "main_strength": "Accommodates overdispersion"
+    },
+    "random_forest": {
+      "display_name": "Random Forest",
+      "model_type": "Machine Learning",
+      "primary_split": {
+        "mae": 0.09809,
+        "aic": null
+      },
+      "repeated_split": {
+        "n_splits": 20,
+        "mean_mae": 0.098202,
+        "std_mae": 0.000402,
+        "ci95_low": 0.098014,
+        "ci95_high": 0.098391,
+        "mean_poisson_deviance": 0.298576,
+        "n_wins": 18,
+        "pct_wins": 90.0,
+        "avg_rank": 1.1
+      },
+      "feature_importance": {
+        "BonusMalus": 0.26547836954441556,
+        "Exposure": 0.2339642435328527,
+        "DrivAge": 0.17191409230219154,
+        "Density": 0.17136253605715496,
+        "VehAge": 0.1572807585633853
+      },
+      "main_strength": "Captures nonlinear effects"
+    },
+    "xgboost": {
+      "display_name": "XGBoost",
+      "model_type": "Machine Learning",
+      "primary_split": {
+        "mae": 0.09821,
+        "aic": null
+      },
+      "repeated_split": {
+        "n_splits": 20,
+        "mean_mae": 0.098275,
+        "std_mae": 0.000388,
+        "ci95_low": 0.098093,
+        "ci95_high": 0.098457,
+        "mean_poisson_deviance": 0.298396,
+        "n_wins": 2,
+        "pct_wins": 10.0,
+        "avg_rank": 1.9
+      },
+      "feature_importance": {
+        "BonusMalus": 0.3164319396018982,
+        "Exposure": 0.26830875873565674,
+        "VehAge": 0.22859302163124084,
+        "DrivAge": 0.12085078656673431,
+        "Density": 0.0658155009150505
+      },
+      "main_strength": "Flexible boosted-tree prediction"
+    }
+  },
+  "cross_model": {
+    "top_feature_all_models": "BonusMalus",
+    "aic_delta_nb2_vs_poisson": -709.37,
+    "repeated_split_best_avg_rank": "random_forest",
+    "predictive_ceiling_note": "MAE spread across all 4 models is under 0.002 on both the primary split and across 20 repeated splits, though the tree-based models' advantage over both GLMs is statistically reproducible (non-overlapping 95% CIs), not noise."
+  }
+}

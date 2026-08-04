@@ -1,18 +1,40 @@
 {
   "poisson": {
-    "features": ["BonusMalus", "DrivAge", "VehAge", "Density"],
+    "features": [
+      "BonusMalus",
+      "DrivAge",
+      "VehAge",
+      "Density"
+    ],
     "uses_offset": true
   },
   "negative_binomial": {
-    "features": ["BonusMalus", "DrivAge", "VehAge", "Density"],
+    "features": [
+      "BonusMalus",
+      "DrivAge",
+      "VehAge",
+      "Density"
+    ],
     "uses_offset": true
   },
   "random_forest": {
-    "features": ["Exposure", "BonusMalus", "DrivAge", "VehAge", "Density"],
+    "features": [
+      "Exposure",
+      "BonusMalus",
+      "DrivAge",
+      "VehAge",
+      "Density"
+    ],
     "uses_offset": false
   },
   "xgboost": {
-    "features": ["Exposure", "BonusMalus", "DrivAge", "VehAge", "Density"],
+    "features": [
+      "Exposure",
+      "BonusMalus",
+      "DrivAge",
+      "VehAge",
+      "Density"
+    ],
     "uses_offset": false
   }
 }

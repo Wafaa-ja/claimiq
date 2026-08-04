@@ -53,6 +53,11 @@ def split_data(df: pd.DataFrame):
 
 
 def fit_poisson(train_df: pd.DataFrame, test_df: pd.DataFrame):
+    """Fits and evaluates the Poisson GLM but does NOT save it yet -- the
+    returned model's .fittedvalues (which require the un-stripped data) are
+    needed by fit_negative_binomial()'s NB2 estimation. Call save_poisson()
+    after fit_negative_binomial() has consumed this model.
+    """
     print("Fitting Poisson GLM...")
     model = smf.glm(
         formula="ClaimNb ~ BonusMalus + DrivAge + VehAge + Density",
@@ -64,28 +69,53 @@ def fit_poisson(train_df: pd.DataFrame, test_df: pd.DataFrame):
     mae = mean_absolute_error(test_df["ClaimNb"], preds)
     aic = model.aic
     print(f"  MAE={mae:.5f}  AIC={aic:.2f}")
+    return mae, aic, model
+
+
+def save_poisson(model):
+    if hasattr(model, "remove_data"):
+        model.remove_data()
     path = os.path.join(MODELS_DIR, "poisson_model.pkl")
     model.save(path)
-    print(f"  Saved to {path}")
-    return mae, aic
+    print(f"  Poisson GLM saved to {path}")
 
 
-def fit_negative_binomial(train_df: pd.DataFrame, test_df: pd.DataFrame):
-    print("Fitting Negative Binomial GLM (alpha=1)...")
-    model = smf.glm(
-        formula="ClaimNb ~ BonusMalus + DrivAge + VehAge + Density",
-        data=train_df,
-        family=sm.families.NegativeBinomial(alpha=1),
-        offset=np.log(train_df["Exposure"]),
-    ).fit()
+def fit_negative_binomial(train_df: pd.DataFrame, test_df: pd.DataFrame, poisson_model=None):
+    """Fits the Negative Binomial GLM with the dispersion parameter (alpha)
+    estimated from the data via maximum likelihood, rather than fixed by
+    assumption. See nb2_validation.fit_nb2_profile_mle for the full rationale
+    and the profile-likelihood algorithm used (mirrors R's glm.nb).
+
+    aic is computed with alpha counted as an estimated parameter (k=6), not
+    the naive GLM-refit .aic (which would report k=5, understating AIC by 2).
+    """
+    from nb2_validation import fit_nb2_profile_mle, fit_poisson_glm
+
+    print("Fitting Negative Binomial GLM (NB2, alpha estimated via profile-likelihood MLE)...")
+    if poisson_model is None:
+        poisson_model = fit_poisson_glm(train_df)
+
+    nb2 = fit_nb2_profile_mle(train_df, poisson_model)
+    if not nb2["converged"]:
+        sys.exit(
+            f"NB2 profile-likelihood estimation did not converge "
+            f"(alpha={nb2['alpha']:.6f}, iterations={nb2['n_iterations']}). "
+            f"Refusing to save an unstable model."
+        )
+
+    model = nb2["model"]
+    alpha = nb2["alpha"]
+    alpha_se = nb2["alpha_se"]
+    aic = nb2["aic_correct"]
     preds = model.predict(test_df, offset=np.log(test_df["Exposure"]))
     mae = mean_absolute_error(test_df["ClaimNb"], preds)
-    aic = model.aic
-    print(f"  MAE={mae:.5f}  AIC={aic:.2f}")
+    print(f"  alpha={alpha:.6f} (SE={alpha_se:.6f})  MAE={mae:.5f}  AIC={aic:.2f} (k=6)")
+    if hasattr(model, "remove_data"):
+        model.remove_data()
     path = os.path.join(MODELS_DIR, "negative_binomial_model.pkl")
     model.save(path)
     print(f"  Saved to {path}")
-    return mae, aic
+    return mae, aic, alpha, alpha_se
 
 
 def fit_random_forest(train_df: pd.DataFrame, test_df: pd.DataFrame):
@@ -182,17 +212,18 @@ def main():
     df = load_data(args.data)
     train_df, test_df = split_data(df)
 
-    poisson_mae, poisson_aic     = fit_poisson(train_df, test_df)
-    nb_mae, nb_aic               = fit_negative_binomial(train_df, test_df)
-    rf_mae, rf_importances       = fit_random_forest(train_df, test_df)
-    xgb_mae, xgb_importances     = fit_xgboost(train_df, test_df)
+    poisson_mae, poisson_aic, poisson_model = fit_poisson(train_df, test_df)
+    nb_mae, nb_aic, nb_alpha, nb_alpha_se   = fit_negative_binomial(train_df, test_df, poisson_model=poisson_model)
+    save_poisson(poisson_model)
+    rf_mae, rf_importances                  = fit_random_forest(train_df, test_df)
+    xgb_mae, xgb_importances                = fit_xgboost(train_df, test_df)
 
     save_metrics(poisson_mae, poisson_aic, nb_mae, nb_aic, rf_mae, xgb_mae)
     save_metadata()
 
     print("\n=== All models saved successfully ===")
     print(f"Poisson GLM  MAE={poisson_mae:.5f}  AIC={poisson_aic:.2f}")
-    print(f"NB GLM       MAE={nb_mae:.5f}  AIC={nb_aic:.2f}")
+    print(f"NB2 GLM      MAE={nb_mae:.5f}  AIC={nb_aic:.2f}  alpha={nb_alpha:.6f} (SE={nb_alpha_se:.6f})")
     print(f"Random Forest  MAE={rf_mae:.5f}")
     print(f"XGBoost        MAE={xgb_mae:.5f}")
 

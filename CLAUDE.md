@@ -387,6 +387,48 @@ Use:
 
 The design may be warm or cute only when it still feels credible and professional.
 
+## Current Visual Identity — "ClaimIQ Modern Identity"
+
+ClaimIQ's visual identity is sourced from a Claude Design project ("ClaimIQ
+dashboard layout guide", file `ClaimIQ Modern Identity.dc.html`) and
+implemented as design tokens in `claimiq/theme.py` — that module is the
+executable source of truth for exact values; this is a summary for quick
+reference, not a duplicate to keep in sync by hand.
+
+Palette:
+
+- Base: off-white surface in light mode (`#F6F7F9` / `#FFFFFF` cards), deep
+  navy `#0B1526` / `#142238` cards in dark mode
+- Text: navy `#10233F` (light mode) / off-white `#EDF1F8` (dark mode)
+- Accent: single gold `#F2A93B` (hover `#D98A1E`), constant across both
+  light and dark mode — it does not shift with the theme
+- Chart series: gold, then three muted blues/greys, also constant across
+  both themes
+
+Typography:
+
+- Manrope (bold/800) for headings and large stat values
+- Inter for body text and UI chrome
+- JetBrains Mono for numeric table columns, equations, and dataset field
+  names
+
+Sidebar:
+
+- Always a dark navy panel, in both light and dark app mode — only the
+  navy shade itself shifts (`#10233F` light-mode sidebar / `#070F1E`
+  dark-mode sidebar). It does not follow the main content's light/dark
+  background the way the rest of the page does.
+
+Structural elements introduced by this identity:
+
+- A gradient hero band (navy, full-bleed within the content column) on the
+  Home page only
+- Pill-shaped model-type chips ("Statistical" / "ML") instead of square tags
+- A gold logo mark ("Q") in the sidebar brand row
+
+Before changing any of this, check `claimiq/theme.py` (`COMMON`/`LIGHT`/`DARK`
+token dicts) rather than guessing at colors from memory.
+
 ---
 
 # Design System Rules
