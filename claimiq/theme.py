@@ -243,14 +243,84 @@ p {{ margin: 0; }}
 a {{ color: var(--accent); }}
 [data-testid="stIconMaterial"], [data-testid="stExpanderIcon"],
 .material-symbols-outlined, [class*="material-symbols"] {{
-    font-family: 'Material Symbols Outlined' !important;
+    /* Streamlit's own bundled icon font is named "Material Symbols
+       Rounded" (see its index.*.css @font-face) — this rule previously
+       forced 'Material Symbols Outlined', a font this app never loads,
+       so ligature text like "keyboard_double_arrow_right" rendered as
+       literal text instead of resolving to the glyph (most visible on
+       the sidebar expand/collapse icon). */
+    font-family: 'Material Symbols Rounded' !important;
 }}
 /* display:none, not visibility:hidden — visibility:hidden still reserves
    the header's ~60px box (and its solid white background can resurface via
    a visibility:visible override on a descendant icon button), which is
    exactly what produced the stray white bar at the top of every page.
    display:none removes both the paint and the reserved space. */
-#MainMenu, footer, header {{ display: none !important; }}
+#MainMenu, footer {{ display: none !important; }}
+/* header itself is kept (not display:none) purely so its one useful
+   descendant — the sidebar re-expand button — can render: Streamlit only
+   inserts stExpandSidebarButton into the DOM while the sidebar is
+   collapsed. header itself is absolutely positioned (confirmed: does not
+   occupy flow space, so this cannot reintroduce the old reserved-box/
+   white-bar bug), made fully transparent and click-through except through
+   that one button, and all of Streamlit's own chrome inside it (menu,
+   deploy, toolbar actions) stays hidden. */
+header[data-testid="stHeader"] {{ background: transparent !important; box-shadow: none !important; pointer-events: none !important; }}
+header[data-testid="stHeader"] [data-testid="stToolbar"] {{ background: transparent !important; }}
+header[data-testid="stHeader"] [data-testid="stToolbarActions"],
+header[data-testid="stHeader"] [data-testid="stAppDeployButton"],
+header[data-testid="stHeader"] [data-testid="stMainMenu"],
+header[data-testid="stHeader"] [data-testid="stMainMenuButton"] {{ display: none !important; }}
+header[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {{
+    pointer-events: auto !important;
+    /* header is position:absolute, which is relative to its scrolling
+       containing block — the button would scroll away with the page once
+       content (a taller wrapped hero, a longer page) pushed it out of
+       view. position:fixed pins it to the viewport itself instead, so it
+       stays put in the same corner no matter what's rendered below it or
+       how far the page is scrolled. top/left match where it already sits
+       today, so this is a positioning-behavior change only, not a visual
+       move. translateZ(0)/backface-visibility promote it to its own
+       compositor layer — mobile Safari in particular is known to let a
+       plain position:fixed element visibly lag/detach for a frame during
+       touch-scroll without this, even though the computed position never
+       actually changes. */
+    position: fixed !important; top: 16px !important; left: 18px !important; z-index: 1000 !important;
+    -webkit-transform: translateZ(0); transform: translateZ(0);
+    -webkit-backface-visibility: hidden; backface-visibility: hidden;
+}}
+/* Swap this button's glyph for a plain hamburger. The element's text
+   content is literally the ligature name "keyboard_double_arrow_right" —
+   Streamlit's icon font reads that string and substitutes a chevron glyph
+   for it; that's what renders as the small »-style symbol. font-size:0
+   collapses that glyph to nothing without touching the button's click
+   area, and ::before paints ☰ in its place at the icon's original size.
+   Color defaults to var(--text) (dark navy in light mode) for every page
+   with a plain background, then flips to white specifically when a
+   .hero-band is present — Home is the only page that renders one, and its
+   gradient is dark in both light and dark app mode. */
+header[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"] {{
+    font-size: 0 !important;
+}}
+header[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"]::before {{
+    content: "☰";
+    font-family: var(--font-sans) !important;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--text);
+}}
+[data-testid="stAppViewContainer"]:has(.hero-band) header[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] [data-testid="stIconMaterial"]::before {{
+    color: #fff;
+}}
+/* initial_sidebar_state="auto" (app.py) collapses the sidebar by default
+   below ~850px, not exactly our own 768px breakpoint — in that ~768-850px
+   sliver the sidebar is still pinned open (see Sidebar shell, further
+   down) but Streamlit would otherwise also mount this button, which would
+   float uselessly over the pinned-open sidebar. Keeping it strictly
+   below 768px keeps tablet/desktop pixel-identical to before. */
+@media (min-width: 768px) {{
+    header[data-testid="stHeader"] [data-testid="stExpandSidebarButton"] {{ display: none !important; }}
+}}
 
 /* ── Layout shell ─────────────────────────────────────────────────────── */
 [data-testid="stMain"] {{ padding-top: 0 !important; margin-top: 0 !important; background: var(--bg) !important; }}
@@ -608,13 +678,83 @@ details summary {{ font-size:var(--text-sm) !important; font-weight:600 !importa
 [data-testid="stExpander"] summary::before, [data-testid="stExpander"] summary::after {{ content:none !important; display:none !important; }}
 [data-testid="stExpander"] summary {{ display:flex !important; align-items:center !important; white-space:nowrap !important; overflow:hidden !important; }}
 [data-testid="stExpander"] summary p {{ margin:0 !important; overflow:hidden !important; text-overflow:ellipsis !important; }}
-section[data-testid="stSidebar"] {{
-    display:block !important; visibility:visible !important; transform:translateX(0) !important; left:0 !important;
-    min-width:var(--sidebar-w) !important; width:var(--sidebar-w) !important; max-width:var(--sidebar-w) !important;
+/* Pinning the sidebar permanently open (display/visibility/transform) is
+   desktop-only. Below 768px it must stay scoped out so Streamlit's own
+   collapse-to-drawer mechanism (triggered by its header hamburger control)
+   keeps working — unscoped, these !important rules fought that mechanism
+   and pinned the 264px sidebar open on phones too, crushing every page's
+   content into a ~120px sliver. Width/background/padding stay unscoped
+   below since those only matter once the drawer is actually open, and a
+   264px drawer is a normal, comfortable overlay width on a phone. */
+@media (min-width: 768px) {{
+    section[data-testid="stSidebar"] {{
+        display:block !important; visibility:visible !important; transform:translateX(0) !important; left:0 !important;
+        min-width:var(--sidebar-w) !important; width:var(--sidebar-w) !important; max-width:var(--sidebar-w) !important;
+    }}
+    section[data-testid="stSidebar"] > div {{ display:block !important; visibility:visible !important; transform:none !important; width:var(--sidebar-w) !important; min-width:var(--sidebar-w) !important; }}
 }}
-section[data-testid="stSidebar"] > div {{ display:block !important; visibility:visible !important; transform:none !important; width:var(--sidebar-w) !important; min-width:var(--sidebar-w) !important; }}
+/* Below 768px the sidebar is a flex child sharing width with the main
+   content (see "Sidebar shell" above, which unconditionally forces it to
+   264px) — on a 390px phone that alone crushes content into a ~120px
+   sliver. Taking it out of flow with position:fixed removes it from the
+   flex layout entirely, so main content reflows to the full viewport width
+   regardless of the sidebar's open/closed state — while leaving Streamlit's
+   own open/close toggle (the translateX transform swap on click) fully
+   intact and working exactly as before, just now as a slide-in overlay
+   instead of a flex column. */
+@media (max-width: 767px) {{
+    section[data-testid="stSidebar"] {{
+        position: fixed !important; top: 0 !important; left: 0 !important; height: 100vh !important; height: 100dvh !important;
+        z-index: 900 !important; box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+    }}
+}}
+/* Pure Premium is the only page that nests st.columns() inside a
+   st.columns() cell (profile inputs + model/currency pickers both sit
+   inside one half of an outer 2-way split). Streamlit's own responsive
+   stacking is viewport-width-based (~640px), not container-width-based, so
+   it never fires here even though the sidebar (now ~264px, or pinned wider
+   above 768px) squeezes that outer half down to a genuinely too-narrow
+   column — 3-way and 2-way sub-splits were rendering at ~65px, wrapping
+   every label onto 3-4 lines. :has() targets exactly this shape (an outer
+   column row whose own cell contains a further nested column row) so only
+   the outer, nesting row stacks — freeing its full width for the row(s)
+   nested inside, which then render exactly as they already do everywhere
+   else they're used un-nested (e.g. the same input grid on Frequency
+   Prediction). No other page on the site nests columns this way, so this
+   rule has no effect anywhere else. */
+@media (max-width: 1024px) {{
+    [data-testid="stHorizontalBlock"]:has([data-testid="stHorizontalBlock"]) {{
+        flex-direction: column !important;
+    }}
+    /* flex-direction alone isn't enough — Streamlit gives each stColumn an
+       explicit width (e.g. calc(50% - gap)) that has nothing to do with
+       flex-direction, so the stacked halves stayed pinned at their old
+       side-by-side width instead of growing to fill the now-vertical row.
+       Only the matched outer row's own direct-child columns are reset —
+       the nested row inside keeps its normal side-by-side widths. */
+    [data-testid="stHorizontalBlock"]:has([data-testid="stHorizontalBlock"]) > [data-testid="stColumn"] {{
+        width: 100% !important; flex: 1 1 100% !important;
+    }}
+}}
 
 /* ── Responsive ───────────────────────────────────────────────────────── */
+/* Large desktop / wide monitors — the 1180px content cap (kept as-is for
+   laptop widths, matching the current appearance exactly) otherwise leaves
+   a growing, unused margin as the viewport widens well past it. Scaled in
+   two steps rather than filling the viewport, so content stays a readable,
+   deliberate column instead of stretching edge-to-edge. Sidebar width is
+   untouched at every size — only the main content cap grows. */
+@media (min-width: 1600px) {{
+    [data-testid="stMainBlockContainer"], .main .block-container, .block-container {{
+        max-width: 1320px !important;
+    }}
+}}
+@media (min-width: 1920px) {{
+    [data-testid="stMainBlockContainer"], .main .block-container, .block-container {{
+        max-width: 1480px !important;
+    }}
+}}
+
 @media (max-width: 860px) {{
     [data-testid="stMainBlockContainer"], .main .block-container, .block-container {{
         padding: var(--space-5) var(--space-4) var(--space-7) !important;
@@ -623,6 +763,23 @@ section[data-testid="stSidebar"] > div {{ display:block !important; visibility:v
         margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-4)) var(--space-6);
         padding: var(--space-6) var(--space-5);
     }}
+}}
+/* Phones — belt-and-suspenders overflow guard (nothing here should actually
+   need to clip once the sidebar collapse fix above is in place, but a hard
+   ceiling costs nothing and protects against any one-off wide element). */
+@media (max-width: 480px) {{
+    html, body {{ overflow-x: hidden; }}
+    .hero-pills {{ gap: var(--space-2); }}
+    .grid-4, .grid-3, .grid-2 {{ grid-template-columns: minmax(0,1fr); }}
+    /* text-hero wraps "Motor insurance frequency intelligence" onto 4 lines
+       at phone widths, making the hero disproportionately tall. A smaller
+       size/tighter leading here only — desktop/tablet are untouched.
+       Selector is `.hero-band .hero-title`, not the bare class, because a
+       Streamlit-internal `[emotion-cache] h1` rule outranks a single-class
+       selector on specificity regardless of source order; this rule needs
+       two classes to reliably outrank it at this breakpoint. */
+    .hero-band .hero-title {{ font-size: 2rem; line-height: 1.18; margin-bottom: var(--space-3) !important; }}
+    .hero-band .hero-sub {{ margin-bottom: var(--space-4); }}
 }}
 @media (prefers-reduced-motion: reduce) {{
   * {{ transition: none !important; animation: none !important; }}

@@ -13,7 +13,7 @@ from claimiq import theme
 from claimiq.pages import about, home, model_comparison, prediction, pure_premium, scenario
 from claimiq.shared import load_all_models, render_sidebar
 
-st.set_page_config(page_title="ClaimIQ", page_icon="⚡", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="ClaimIQ", page_icon="⚡", layout="wide", initial_sidebar_state="auto")
 
 theme.inject_css()
 
